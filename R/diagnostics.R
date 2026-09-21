@@ -3,7 +3,6 @@
 #' Internal implementation interface for the DataRaft package family.
 #' @usage NULL
 #' @keywords internal
-#' @export
 #' @name measurement_quality
 
 measurement_quality <- function(x) {
@@ -16,7 +15,7 @@ measurement_quality <- function(x) {
     reference <- attr(value, "dr_quality_reference")
     unavailable <- function() {
       rlang::local_error_call(rlang::caller_env())
-      dataraft.core::quality_row(
+      dataraft.core::dr_internal_quality_row(
         "input_release",
         "not_checked",
         stage = "input",
@@ -26,7 +25,7 @@ measurement_quality <- function(x) {
     checks <- if (
       !identical(
         manifest$result_hash,
-        dataraft.core::report_fingerprint(as.data.frame(value))
+        report_fingerprint(as.data.frame(value))
       ) ||
         !is.list(reference) ||
         !identical(reference$asset, manifest$product) ||
@@ -50,17 +49,17 @@ measurement_quality <- function(x) {
                 reference$config[c("backend", "catalog", "storage")]
               )
             ) {
-              dataraft.core::abort(
+              dataraft.core::dr_internal_abort(
                 subclass = "dataraft_error_metrics",
                 "The retained quality reference does not match the lake."
               )
             }
           } else {
-            lake <- dataraft.lake::dr_connect_lake(
+            lake <- optional_lake("dr_connect_lake")(
               reference$config,
               read_only = TRUE
             )
-            on.exit(dataraft.lake::dr_disconnect_lake(lake), add = TRUE)
+            on.exit(optional_lake("dr_disconnect_lake")(lake), add = TRUE)
           }
           dataraft.core::dr_quality(
             lake,
@@ -88,7 +87,6 @@ measurement_quality <- function(x) {
 #' Internal implementation interface for the DataRaft package family.
 #' @usage NULL
 #' @keywords internal
-#' @export
 #' @name diagnostic_measurements
 
 diagnostic_measurements <- function(x) {
@@ -101,10 +99,10 @@ diagnostic_measurements <- function(x) {
   if (
     !identical(
       manifest$result_hash,
-      dataraft.core::report_fingerprint(as.data.frame(x))
+      report_fingerprint(as.data.frame(x))
     )
   ) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "Metric result changed after calculation."
     )

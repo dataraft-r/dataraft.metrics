@@ -2,7 +2,7 @@
 #' @noRd
 #' @importFrom dataraft.core dr_execute
 dr_execute.dr_metric <- function(object, lake = NULL, ...) {
-  dataraft.lake::with_execution_lake(lake, function(con) {
+  optional_lake("dr_internal_with_execution_lake")(lake, function(con) {
     dr_measure(con, object, ...)
   })
 }
