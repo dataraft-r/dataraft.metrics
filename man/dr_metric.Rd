@@ -60,7 +60,9 @@ or custom functions. Known expression columns are always checked as well.}
 Metric specification. Reports execute it directly without an LLM.
 }
 \description{
-Define a metric for exploration or approved reporting
+Define a reusable calculation, such as a total or cancellation rate, for a
+data product. Choose its grouping columns, unit and date behavior, then
+calculate it with \code{\link[=dr_measure]{dr_measure()}}.
 }
 \examples{
 metric <- dr_metric(
