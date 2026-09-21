@@ -1,4 +1,8 @@
 #' Define a metric for exploration or approved reporting
+#'
+#' Define a reusable calculation, such as a total or cancellation rate, for a
+#' data product. Choose its grouping columns, unit and date behavior, then
+#' calculate it with [dr_measure()].
 #' @param id,version Identity and version.
 #' @param product Input asset id.
 #' @param expr Tidy evaluation summary expression, e.g. sum(reserve).
@@ -86,7 +90,10 @@ dr_metric <- function(
   if (time_behavior == "stock" && is.null(time_column)) {
     dataraft.core::abort(
       subclass = "dataraft_error_metrics",
-      "A stock metric requires time_column."
+      c(
+        "A stock metric requires time_column.",
+        i = 'Supply the observation-date column, for example time_column = "date".'
+      )
     )
   }
   if (!is.null(time_column)) {
