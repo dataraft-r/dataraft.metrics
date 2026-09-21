@@ -12,4 +12,4 @@
       dr_report_release(f$lake, "nested", list(total = value), "v1")
     Condition
       Error in `FUN()`:
-
+      ! Report columns must be atomic vectors. Expand nested metric values into named columns before recalculating and saving a report.
