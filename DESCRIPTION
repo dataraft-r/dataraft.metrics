@@ -8,11 +8,11 @@ Description: Compute reusable metrics on tables and checked product results.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends: R (>= 4.2.0)
-Imports: DBI, dataraft.core, digest, dplyr (>= 1.1.0), jsonlite, rlang, tibble
-Suggests: bit64, dataraft.lake, duckdb (>= 1.5.5), testthat (>= 3.2.0), yaml, dataraft.catalog, shiny, withr
+Imports: codetools, DBI, dataraft.core (>= 0.1.0.9000), digest, dplyr (>= 1.1.0), jsonlite, rlang, tibble
+Suggests: bit64, dataraft.lake (>= 0.1.0.9000), duckdb (>= 1.5.5), testthat (>= 3.2.0), yaml, dataraft.catalog (>= 0.1.0.9000), shiny, withr
 Config/testthat/edition: 3
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
-Remotes: dataraft-r/dataraft.catalog, dataraft-r/dataraft.core, dataraft-r/dataraft.lake
+Remotes: dataraft-r/dataraft.catalog@79f262a5e534a805edcba38624c7a683c800910e, dataraft-r/dataraft.core@bdbc4f793f95784dfdc8ba026b723da88a0a3643, dataraft-r/dataraft.lake@b748a7eea40f204b2f0497f369e12303e8141255
 URL: https://github.com/dataraft-r/dataraft.metrics
 BugReports: https://github.com/dataraft-r/dataraft.metrics/issues

@@ -4,7 +4,7 @@
 \alias{dr_commons_yaml}
 \title{Export an explicit declarative definition for data-dict and commons}
 \usage{
-dr_commons_yaml(metric, table, sql_expr, path)
+dr_commons_yaml(metric, table, sql_expr, path, expected_binding = NULL)
 }
 \arguments{
 \item{metric}{Registered metric definition for business metadata.}
@@ -16,6 +16,11 @@ environment.}
 SUM(reserve).}
 
 \item{path}{Output YAML file.}
+
+\item{expected_binding}{Optional hash from the returned path's
+\code{definition_binding} attribute, saved after independent SQL review. A changed
+metric, table or SQL expression fails before writing. This does not prove
+equivalence of the R and SQL computations.}
 }
 \value{
 Path. This adapter exports metadata; it does not execute or install
