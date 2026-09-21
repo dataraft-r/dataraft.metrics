@@ -37,7 +37,7 @@ dr_metric_set <- function(
   expressions <- rlang::enquos(..., .ignore_empty = "none")
   labels <- names(expressions)
   if (!length(expressions) || any(!nzchar(labels)) || anyDuplicated(labels)) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "Supply uniquely named metric expressions."
     )
@@ -45,7 +45,7 @@ dr_metric_set <- function(
   expand <- function(x, name, default = NULL) {
     rlang::local_error_call(rlang::caller_env())
     if (!is.character(x) || anyNA(x)) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         paste(name, "must be character.")
       )
@@ -59,13 +59,13 @@ dr_metric_set <- function(
         anyDuplicated(names(x)) ||
         any(!names(x) %in% labels)
     ) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         paste(name, "must be a single value or uniquely named by metric.")
       )
     }
     if (is.null(default) && !all(labels %in% names(x))) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         paste(name, "must cover every metric.")
       )

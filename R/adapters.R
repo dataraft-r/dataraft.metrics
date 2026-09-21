@@ -19,17 +19,17 @@
 #' cat(readLines(path), sep = "\n")
 #' unlink(path)
 dr_commons_yaml <- function(metric, table, sql_expr, path) {
-  dataraft.core::need("yaml")
-  dataraft.core::scalar(table, "table")
-  dataraft.core::scalar(sql_expr, "sql_expr")
+  dataraft.core::dr_internal_need("yaml")
+  dataraft.core::dr_internal_scalar(table, "table")
+  dataraft.core::dr_internal_scalar(sql_expr, "sql_expr")
   if (grepl(";|--|/\\*", sql_expr)) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "Supply one expression, not a SQL statement or comments."
     )
   }
   if (!metric$approved) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "Export only approved metrics."
     )

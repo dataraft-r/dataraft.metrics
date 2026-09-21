@@ -48,14 +48,14 @@ dr_metric <- function(
   code_version = NULL,
   input_columns = NULL
 ) {
-  dataraft.core::asset_id(id)
-  dataraft.core::asset_id(product)
-  dataraft.core::scalar(version, "version")
-  dataraft.core::flag(approved, "approved")
+  dataraft.core::dr_internal_asset_id(id)
+  dataraft.core::dr_internal_asset_id(product)
+  dataraft.core::dr_internal_scalar(version, "version")
+  dataraft.core::dr_internal_flag(approved, "approved")
   if (approved || !is.null(code_version)) {
-    dataraft.core::scalar(code_version, "code_version")
+    dataraft.core::dr_internal_scalar(code_version, "code_version")
     if (!nzchar(trimws(code_version))) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "code_version must not be blank."
       )
@@ -64,31 +64,31 @@ dr_metric <- function(
   for (field in c("unit", "owner", "description")) {
     value <- get(field)
     if (!is.character(value) || length(value) != 1L || is.na(value)) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         paste(field, "must be a string; use an empty string to omit it.")
       )
     }
   }
   if (!is.null(input_columns)) {
-    invisible(lapply(input_columns, dataraft.core::column_name))
+    invisible(lapply(input_columns, dataraft.core::dr_internal_column_name))
   }
   ex <- rlang::enquo(expr)
   if (rlang::quo_is_null(ex) == is.null(compute)) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "Supply exactly one of expr or compute."
     )
   }
   if (!is.null(compute) && !is.function(compute)) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "compute must be a function."
     )
   }
   time_behavior <- match.arg(time_behavior, c("stock", "flow"))
   if (time_behavior == "stock" && is.null(time_column)) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       c(
         "A stock metric requires time_column.",
@@ -97,17 +97,17 @@ dr_metric <- function(
     )
   }
   if (!is.null(time_column)) {
-    dataraft.core::column_name(time_column)
+    dataraft.core::dr_internal_column_name(time_column)
   }
-  invisible(lapply(dimensions, dataraft.core::column_name))
+  invisible(lapply(dimensions, dataraft.core::dr_internal_column_name))
   if (!identical(na_policy, "reject") && !identical(na_policy, "expression")) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "na_policy is reject or expression."
     )
   }
   if (!identical(empty_policy, "error")) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "Empty metric input always produces an error."
     )
@@ -175,7 +175,7 @@ dr_metric <- function(
 #'   Grouped results are ordered by the requested dimensions using C collation
 #'   so database row order does not change report identity.
 #' @export
-#' @examplesIf requireNamespace("duckdb", quietly = TRUE)
+#' @examplesIf requireNamespace("dataraft.lake", quietly = TRUE) && requireNamespace("duckdb", quietly = TRUE)
 #' root <- tempfile("dataraft-example-")
 #' config <- dataraft.lake::dr_lake_config(
 #'   dataraft.lake::dr_registry_duckdb(file.path(root, "lake.db")),
@@ -214,14 +214,14 @@ dr_measure <- function(
   period = c("each", "aggregate")
 ) {
   if (inherits(x, "dr_model_result")) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "Choose a reporting table with dr_product('report', model_result, table = 'table_name'), then dr_trial() or dr_publish() that product before dr_measure()."
     )
   }
   if (!is.null(metrics)) {
     if (!is.null(metric)) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "Supply either metric or metrics, not both."
       )
@@ -243,22 +243,22 @@ dr_measure <- function(
     return(result)
   }
   if (!missing(period)) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "period applies only when using metrics."
     )
   }
   if (!inherits(metric, "dr_metric")) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "metric must be a metric."
     )
   }
   if (!isTRUE(metric$approved)) {
     record <- record %||% FALSE
-    dataraft.core::flag(record, "record")
+    dataraft.core::dr_internal_flag(record, "record")
     if (record) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "Exploratory metrics cannot be recorded. Use record = FALSE."
       )
@@ -267,21 +267,21 @@ dr_measure <- function(
   exploring <- inherits(x, "dr_run_result") && identical(x$status, "completed")
   if (exploring) {
     record <- record %||% FALSE
-    dataraft.core::flag(record, "record")
+    dataraft.core::dr_internal_flag(record, "record")
     if (record || !is.null(release)) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "Trial measurements cannot record lineage or select a release. Publish the product first."
       )
     }
     if (!identical(metric$product, x$asset)) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "The metric input asset does not match this trial result."
       )
     }
     data <- x$data
-    dataraft.core::table_result(data, "Trial measurement input")
+    dataraft.core::dr_internal_table_result(data, "Trial measurement input")
     lake <- source <- NULL
     ref <- data.frame(
       release_id = NA_character_,
@@ -303,34 +303,34 @@ dr_measure <- function(
         is.na(x$release_id) ||
         !nzchar(x$release_id)
     ) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "dr_measure() needs a successful published result with an exact release."
       )
     }
     if (!identical(metric$product, x$asset)) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "The metric input asset does not match this publication result."
       )
     }
     if (!is.null(release) && !identical(release, x$release_id)) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "A publication result is pinned. Omit release or use its exact release id."
       )
     }
     record <- record %||% FALSE
-    dataraft.core::flag(record, "record")
+    dataraft.core::dr_internal_flag(record, "record")
     if (record) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "Use a connected writable lake to record metric definitions and lineage."
       )
     }
-    source <- dataraft.core::normalize_result_source(x)
+    source <- dataraft.core::dr_internal_normalize_result_source(x)
     if (!inherits(source, "dr_release_source")) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "The publication result has no readable lake release reference."
       )
@@ -346,28 +346,28 @@ dr_measure <- function(
             lake$config[c("backend", "catalog", "storage")]
           )
       ) {
-        dataraft.core::abort(
+        dataraft.core::dr_internal_abort(
           subclass = "dataraft_error_metrics",
           "The result's connection and saved configuration describe different lakes."
         )
       }
     } else if (inherits(source$lake, "dr_config")) {
-      lake <- dataraft.lake::dr_connect_lake(source$lake, read_only = TRUE)
-      on.exit(dataraft.lake::dr_disconnect_lake(lake), add = TRUE)
+      lake <- optional_lake("dr_connect_lake")(source$lake, read_only = TRUE)
+      on.exit(optional_lake("dr_disconnect_lake")(lake), add = TRUE)
     } else {
       lake <- source$lake
-      dataraft.lake::assert_lake(lake)
+      optional_lake("dr_internal_assert_lake")(lake)
     }
     release <- x$release_id
   } else {
     lake <- x
-    dataraft.lake::assert_lake(lake)
+    optional_lake("dr_internal_assert_lake")(lake)
     record <- record %||% !isTRUE(lake$config$read_only)
-    dataraft.core::flag(record, "record")
-    if (record) dataraft.lake::assert_writable(lake)
+    dataraft.core::dr_internal_flag(record, "record")
+    if (record) optional_lake("dr_internal_assert_writable")(lake)
   }
   if (!all(by %in% metric$dimensions)) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "Unsupported metric dimensions."
     )
@@ -376,38 +376,40 @@ dr_measure <- function(
     length(filters) &&
       (is.null(names(filters)) || !all(names(filters) %in% metric$dimensions))
   ) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "Filters must be named permitted dimensions."
     )
   }
   if (record) {
-    dataraft.lake::dr_register(lake, metric)
+    optional_lake("dr_register")(lake, metric)
   } else if (!exploring && isTRUE(metric$approved)) {
-    old <- dataraft.lake::query(
+    old <- optional_lake("dr_internal_query")(
       lake,
       paste(
         "SELECT fingerprint FROM",
-        dataraft.lake::meta(lake, "assets"),
+        optional_lake("dr_internal_meta")(lake, "assets"),
         "WHERE id = ? AND version = ? AND kind = 'metric'"
       ),
       list(metric$id, metric$version)
     )
-    if (
-      nrow(old) && any(old$fingerprint != dataraft.core::fingerprint(metric))
-    ) {
-      dataraft.core::abort(
+    if (nrow(old) && any(old$fingerprint != fingerprint(metric))) {
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "Definition changed without a version bump."
       )
     }
   }
   if (!exploring) {
-    ref <- dataraft.lake::resolve_release(lake, metric$product, release)
-    data <- dataraft.lake::dr_tbl(lake, metric$product, ref$release_id[[1]])
+    ref <- optional_lake("dr_internal_resolve_release")(
+      lake,
+      metric$product,
+      release
+    )
+    data <- optional_lake("dr_tbl")(lake, metric$product, ref$release_id[[1]])
   }
   if (!all(c(by, names(filters), metric$time_column) %in% colnames(data))) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "Metric columns missing from input product."
     )
@@ -417,21 +419,21 @@ dr_measure <- function(
   }
   if (!is.null(at)) {
     if (is.null(metric$time_column)) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "Metric has no time column."
       )
     }
     if (anyNA(at) || !length(at)) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "at cannot be missing or empty."
       )
     }
     data <- dplyr::filter(data, !!rlang::sym(metric$time_column) %in% !!at)
   }
-  if (!dataraft.core::count_rows(data)) {
-    dataraft.core::abort(
+  if (!count_rows(data)) {
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "Metric input is empty."
     )
@@ -442,7 +444,7 @@ dr_measure <- function(
       2
     ))
     if (nrow(periods) != 1 || anyNA(periods)) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "Stock metrics require exactly one non-missing business date. Supply at."
       )
@@ -450,9 +452,9 @@ dr_measure <- function(
   }
   if (metric$na_policy == "reject") {
     columns <- metric_input_columns(metric, colnames(data))
-    missing <- dataraft.core::null_counts(data, columns)
+    missing <- null_counts(data, columns)
     if (any(missing > 0)) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         paste(
           "Missing metric input:",
@@ -468,7 +470,7 @@ dr_measure <- function(
       result <- dplyr::collect(result)
     }
     if (!is.data.frame(result)) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "Custom metric must return a data.frame or lazy table."
       )
@@ -486,14 +488,14 @@ dr_measure <- function(
     ))
   }
   if (!nrow(result)) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "Metric returned an empty result.",
       "dr_metric_empty"
     )
   }
   if (!all(by %in% colnames(result))) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "Custom metric result must include all requested grouping columns."
     )
@@ -502,7 +504,7 @@ dr_measure <- function(
     (!length(by) && nrow(result) != 1L) ||
       (length(by) && anyDuplicated(as.data.frame(result[by])))
   ) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "Metric results must contain exactly one row per requested group."
     )
@@ -515,7 +517,7 @@ dr_measure <- function(
       logical(1)
     ))
   ) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "Metric returned a missing or non-finite numeric result."
     )
@@ -527,8 +529,8 @@ dr_measure <- function(
   manifest <- list(
     metric = metric$id,
     metric_version = metric$version,
-    metric_hash = dataraft.core::fingerprint(metric),
-    metric_definition = dataraft.core::canonical(metric),
+    metric_hash = fingerprint(metric),
+    metric_definition = canonical(metric),
     code_version = metric$code_version,
     product = metric$product,
     release_id = ref$release_id[[1]],
@@ -540,8 +542,8 @@ dr_measure <- function(
     at = as.character(at),
     filters = filters,
     params = params,
-    calculated_at = dataraft.core::now(),
-    result_hash = dataraft.core::report_fingerprint(result)
+    calculated_at = now(),
+    result_hash = report_fingerprint(result)
   )
   attr(result, "dr_manifest") <- manifest
   attr(result, "dr_quality_reference") <- if (exploring) {
@@ -566,17 +568,17 @@ dr_measure <- function(
   }
   if (
     record &&
-      !dataraft.lake::query(
+      !optional_lake("dr_internal_query")(
         lake,
         paste(
           "SELECT count(*) AS n FROM",
-          dataraft.lake::meta(lake, "lineage_edges"),
+          optional_lake("dr_internal_meta")(lake, "lineage_edges"),
           "WHERE from_id = ? AND from_version = ? AND to_id = ? AND to_version = ? AND relation = 'measured_from'"
         ),
         list(metric$product, ref$release_id[[1]], metric$id, metric$version)
       )$n[[1]]
   ) {
-    dataraft.lake::insert_meta(
+    optional_lake("dr_internal_insert_meta")(
       lake,
       "lineage_edges",
       list(
@@ -629,7 +631,7 @@ inform_measure_grouping <- function(metrics) {
 #' @return Report manifest including result values as data frames, both on
 #'   initial save and an identical retry. Retries preserve original timestamps.
 #' @export
-#' @examplesIf requireNamespace("duckdb", quietly = TRUE)
+#' @examplesIf requireNamespace("dataraft.lake", quietly = TRUE) && requireNamespace("duckdb", quietly = TRUE)
 #' root <- tempfile("dataraft-example-")
 #' config <- dataraft.lake::dr_lake_config(
 #'   dataraft.lake::dr_registry_duckdb(file.path(root, "lake.db")),
@@ -670,7 +672,7 @@ dr_report_release <- function(
       (is.list(lake) && !inherits(lake, c("dr_lake", "dr_config")))
   ) {
     if (!is.null(results)) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "Supply results only once."
       )
@@ -680,7 +682,7 @@ dr_report_release <- function(
   }
   if (!is.null(to)) {
     if (!is.null(lake)) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "Supply either lake or to, not both."
       )
@@ -697,8 +699,8 @@ dr_report_release <- function(
     set_metadata <- attr(results, "dr_set_metadata")
     results <- unclass(results)
   }
-  dataraft.core::scalar(id, "id")
-  dataraft.core::scalar(code_version, "code_version")
+  dataraft.core::dr_internal_scalar(id, "id")
+  dataraft.core::dr_internal_scalar(code_version, "code_version")
   if (
     !is.list(results) ||
       !length(results) ||
@@ -707,7 +709,7 @@ dr_report_release <- function(
       any(!nzchar(names(results))) ||
       anyDuplicated(names(results))
   ) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "results must be a named list."
     )
@@ -715,19 +717,19 @@ dr_report_release <- function(
   measures <- lapply(results, function(x) {
     m <- attr(x, "dr_manifest")
     if (is.null(m)) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "Use the original dr_measure() result to save a report, before dr_collect() or table edits. The original result retains the calculation and input history."
       )
     }
     if (identical(m$input_published, FALSE)) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "Trial measurements cannot be saved in reports. Publish the product and recalculate first."
       )
     }
     if (!isTRUE(m$metric_definition$approved)) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "Exploratory metrics cannot be saved in reports. After business review, define the metrics with approved = TRUE and code_version = \"your-version\", then dr_measure() again. Approval is your explicit declaration, not an automatic check."
       )
@@ -735,26 +737,26 @@ dr_report_release <- function(
     if (
       !identical(
         m$metric_hash,
-        dataraft.core::fingerprint(m$metric_definition)
+        fingerprint(m$metric_definition)
       ) ||
         !identical(m$metric, m$metric_definition$id) ||
         !identical(m$metric_version, m$metric_definition$version) ||
         !identical(m$product, m$metric_definition$product) ||
         !identical(m$code_version, m$metric_definition$code_version)
     ) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "Metric definition changed after calculation. Recalculate before reporting."
       )
     }
-    dataraft.core::scalar(m$code_version, "metric code_version")
+    dataraft.core::dr_internal_scalar(m$code_version, "metric code_version")
     if (
       !identical(
         m$result_hash,
-        dataraft.core::report_fingerprint(as.data.frame(x))
+        report_fingerprint(as.data.frame(x))
       )
     ) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "Metric result changed after calculation."
       )
@@ -768,17 +770,17 @@ dr_report_release <- function(
         logical(1)
       ))
     ) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "Report columns must be atomic vectors. Expand nested metric values into named columns before recalculating and saving a report."
       )
     }
     for (column in x) {
       if (inherits(column, "integer64")) {
-        dataraft.core::need("bit64")
+        dataraft.core::dr_internal_need("bit64")
         limit <- bit64::as.integer64("9007199254740992")
         if (any(column > limit | column < -limit, na.rm = TRUE)) {
-          dataraft.core::abort(
+          dataraft.core::dr_internal_abort(
             subclass = "dataraft_error_metrics",
             paste(
               "Report storage cannot preserve these integers exactly.",
@@ -799,9 +801,9 @@ dr_report_release <- function(
   }
   if (!inherits(lake, "dr_lake")) {
     lake <- report_connection(lake, read_only = FALSE)
-    on.exit(dataraft.lake::dr_disconnect_lake(lake), add = TRUE)
+    on.exit(optional_lake("dr_disconnect_lake")(lake), add = TRUE)
   }
-  dataraft.lake::assert_writable(lake)
+  optional_lake("dr_internal_assert_writable")(lake)
   manifest <- list(
     id = id,
     code_version = code_version,
@@ -811,11 +813,11 @@ dr_report_release <- function(
   if (!is.null(set_metadata)) {
     manifest$measurement_set <- set_metadata
   }
-  old <- dataraft.lake::query(
+  old <- optional_lake("dr_internal_query")(
     lake,
     paste(
       "SELECT manifest FROM",
-      dataraft.lake::meta(lake, "reports"),
+      optional_lake("dr_internal_meta")(lake, "reports"),
       "WHERE id=?"
     ),
     list(id)
@@ -824,15 +826,15 @@ dr_report_release <- function(
     if (
       !identical(
         report_identity(old$manifest[[1]]),
-        report_identity(dataraft.core::report_json(manifest))
+        report_identity(report_json(manifest))
       )
     ) {
-      dataraft.core::abort(
+      dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",
         "Report id already exists with different content."
       )
     }
-    saved <- dataraft.core::jdecode(old$manifest[[1]])
+    saved <- jdecode(old$manifest[[1]])
     for (name in names(manifest$measures)) {
       manifest$measures[[name]]$manifest$calculated_at <-
         saved$measures[[name]]$manifest$calculated_at
@@ -840,17 +842,17 @@ dr_report_release <- function(
     return(manifest)
   } else {
     DBI::dbWithTransaction(lake$con, {
-      dataraft.lake::insert_meta(
+      optional_lake("dr_internal_insert_meta")(
         lake,
         "reports",
         list(
           id = id,
-          created_at = dataraft.core::now(),
-          manifest = dataraft.core::report_json(manifest)
+          created_at = now(),
+          manifest = report_json(manifest)
         )
       )
       for (m in measures) {
-        dataraft.lake::insert_meta(
+        optional_lake("dr_internal_insert_meta")(
           lake,
           "lineage_edges",
           list(
@@ -873,7 +875,7 @@ metric_input_columns <- function(metric, available) {
   rlang::local_error_call(rlang::caller_env())
   declared <- metric$input_columns
   if (!all(declared %in% available)) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "Declared metric input columns are missing."
     )
@@ -897,7 +899,7 @@ metric_input_columns <- function(metric, available) {
       }
       if (is.character(value) && length(value) == 1L) {
         if (!value %in% available) {
-          dataraft.core::abort(
+          dataraft.core::dr_internal_abort(
             subclass = "dataraft_error_metrics",
             paste("Metric input column is missing:", value)
           )
@@ -914,7 +916,7 @@ metric_input_columns <- function(metric, available) {
   }
   visit(expression)
   if (dynamic && is.null(declared)) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       "Dynamic metric expressions require input_columns for missing-value checks."
     )
@@ -925,12 +927,12 @@ metric_input_columns <- function(metric, available) {
 
 report_identity <- function(json) {
   rlang::local_error_call(rlang::caller_env())
-  value <- dataraft.core::jdecode(json)
+  value <- jdecode(json)
   value$measures <- lapply(value$measures, function(x) {
     x$manifest$calculated_at <- NULL
     x
   })
-  dataraft.core::report_json(value)
+  report_json(value)
 }
 
 
@@ -954,28 +956,28 @@ report_identity <- function(json) {
 dr_report_read <- function(lake, id, values_only = FALSE) {
   if (!inherits(lake, "dr_lake")) {
     lake <- report_connection(lake, read_only = TRUE)
-    on.exit(dataraft.lake::dr_disconnect_lake(lake), add = TRUE)
+    on.exit(optional_lake("dr_disconnect_lake")(lake), add = TRUE)
   }
-  dataraft.lake::assert_lake(lake)
-  dataraft.core::scalar(id, "id")
-  dataraft.core::flag(values_only, "values_only")
-  row <- dataraft.lake::query(
+  optional_lake("dr_internal_assert_lake")(lake)
+  dataraft.core::dr_internal_scalar(id, "id")
+  dataraft.core::dr_internal_flag(values_only, "values_only")
+  row <- optional_lake("dr_internal_query")(
     lake,
     paste(
       "SELECT manifest FROM",
-      dataraft.lake::meta(lake, "reports"),
+      optional_lake("dr_internal_meta")(lake, "reports"),
       "WHERE id = ?"
     ),
     list(id)
   )
   if (nrow(row) != 1L) {
-    dataraft.core::abort(
+    dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
       paste("Report not found:", id),
       "dr_no_report"
     )
   }
-  manifest <- dataraft.core::jdecode(row$manifest[[1]])
+  manifest <- jdecode(row$manifest[[1]])
   if (!values_only) {
     return(manifest)
   }
