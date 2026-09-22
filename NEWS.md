@@ -20,3 +20,5 @@
 
 * `dr_report_release()` coordinates concurrent PostgreSQL issuance by report ID,
   keeping identical retries idempotent without locking metric calculation.
+
+* Diagnostic providers now implement public S3 methods; status, quality and lineage no longer require reverse calls from core into extension packages.
