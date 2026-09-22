@@ -25,7 +25,8 @@ dr_measure(
 }
 \arguments{
 \item{x}{Connected lake or successful \code{dr_run_result}. In-memory \code{\link[dataraft.core:dr_trial]{dataraft.core::dr_trial()}}
-results support exploratory measurements with the same definitions. They
+results, including \code{unvalidated} inputs without a declared contract, support
+exploratory measurements with the same definitions. They
 cannot be recorded or saved in issued reports, even for approved metrics.}
 
 \item{...}{Reserved for future extensions.}

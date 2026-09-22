@@ -146,7 +146,8 @@ dr_metric <- function(
 #' lake is borrowed when available. Otherwise the saved configuration opens an
 #' owned read-only connection that closes before returning, including on errors.
 #' @param x Connected lake or successful `dr_run_result`. In-memory [dataraft.core::dr_trial()]
-#'   results support exploratory measurements with the same definitions. They
+#'   results, including `unvalidated` inputs without a declared contract, support
+#'   exploratory measurements with the same definitions. They
 #'   cannot be recorded or saved in issued reports, even for approved metrics.
 #' @param metric Single metric definition.
 #' @param metrics Nonempty list of metric definitions for a measurement set.
@@ -264,7 +265,8 @@ dr_measure <- function(
       )
     }
   }
-  exploring <- inherits(x, "dr_run_result") && identical(x$status, "completed")
+  exploring <- inherits(x, "dr_run_result") &&
+    (identical(x$status, "completed") || identical(x$status, "unvalidated"))
   if (exploring) {
     record <- record %||% FALSE
     dataraft.core::dr_internal_flag(record, "record")
@@ -285,7 +287,7 @@ dr_measure <- function(
     lake <- source <- NULL
     ref <- data.frame(
       release_id = NA_character_,
-      quality = "trial",
+      quality = if (identical(x$status, "unvalidated")) "unvalidated" else "trial",
       published_at = NA_character_
     )
   } else if (inherits(x, "dr_run_result")) {
@@ -559,6 +561,7 @@ dr_measure <- function(
     replay_inputs = replay_inputs,
     result_hash = report_fingerprint(result)
   )
+  class(result) <- unique(c("dr_measurement", class(result)))
   attr(result, "dr_manifest") <- manifest
   attr(result, "dr_quality_reference") <- if (exploring) {
     list(
@@ -1025,6 +1028,7 @@ dr_report_read <- function(lake, id, values_only = FALSE) {
     x
   })
   for (i in seq_along(values)) {
+    class(values[[i]]) <- unique(c("dr_measurement", class(values[[i]])))
     attr(values[[i]], "dr_manifest") <- manifest$measures[[i]]$manifest
     attr(values[[i]], "dr_manifest")$by <-
       unlist(manifest$measures[[i]]$manifest$by, use.names = FALSE)
