@@ -1,5 +1,8 @@
 # dataraft.metrics 0.1.0.9000
 
+* Full CI now rejects skipped test blocks and records per-test summaries and
+  explicit skip reasons as check artifacts.
+
 * Keep stateless helpers private and prefix shared implementation interfaces with `dr_internal_`. Move component tests into their owning repository; add minimal and downstream CI.
 
 * Explain the required date column for stock metrics and test metric definitions independently.
