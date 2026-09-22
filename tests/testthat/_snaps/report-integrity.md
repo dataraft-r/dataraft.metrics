@@ -13,3 +13,4 @@
     Condition
       Error in `FUN()`:
       ! Report columns must be atomic vectors. Expand nested metric values into named columns before recalculating and saving a report.
+

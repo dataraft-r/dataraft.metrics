@@ -38,14 +38,16 @@ test_that("exploration computes without registration and cannot become a report"
   values <- dr_measure(f$lake, metrics = definitions)
   expect_equal(dr_collect(values)$value, 300)
   expect_equal(
-    query(
-      f$lake,
-      paste(
-        "SELECT count(*) AS n FROM",
-        meta(f$lake, "assets"),
-        "WHERE kind = 'metric'"
-      )
-    )$n,
+    as.numeric(
+      query(
+        f$lake,
+        paste(
+          "SELECT count(*) AS n FROM",
+          meta(f$lake, "assets"),
+          "WHERE kind = 'metric'"
+        )
+      )$n
+    ),
     0
   )
   expect_snapshot(
@@ -63,10 +65,12 @@ test_that("exploration computes without registration and cannot become a report"
     dr_report_release(single, "mutated", code_version = "v1")
   )
   expect_equal(
-    query(
-      f$lake,
-      paste("SELECT count(*) AS n FROM", meta(f$lake, "reports"))
-    )$n,
+    as.numeric(
+      query(
+        f$lake,
+        paste("SELECT count(*) AS n FROM", meta(f$lake, "reports"))
+      )$n
+    ),
     0
   )
 })

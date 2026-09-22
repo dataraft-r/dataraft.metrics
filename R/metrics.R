@@ -464,6 +464,16 @@ dr_measure <- function(
     }
   }
 
+  execution <- report_environment(lake)
+  replay_inputs <- tryCatch(
+    report_input_encode(list(
+      by = by,
+      at = at,
+      filters = filters,
+      params = params
+    )),
+    error = function(e) NULL
+  )
   if (!is.null(metric$compute)) {
     result <- metric$compute(data, by, params)
     if (inherits(result, "tbl_sql")) {
@@ -530,6 +540,7 @@ dr_measure <- function(
     metric = metric$id,
     metric_version = metric$version,
     metric_hash = fingerprint(metric),
+    fingerprint_format = 3L,
     metric_definition = canonical(metric),
     code_version = metric$code_version,
     product = metric$product,
@@ -543,6 +554,9 @@ dr_measure <- function(
     filters = filters,
     params = params,
     calculated_at = now(),
+    execution = execution,
+    environment_fingerprint = report_fingerprint(execution),
+    replay_inputs = replay_inputs,
     result_hash = report_fingerprint(result)
   )
   attr(result, "dr_manifest") <- manifest
@@ -804,6 +818,11 @@ dr_report_release <- function(
     on.exit(optional_lake("dr_disconnect_lake")(lake), add = TRUE)
   }
   optional_lake("dr_internal_assert_writable")(lake)
+  optional_lake("dr_internal_acquire_lake_writer")(
+    lake,
+    environment(),
+    paste0("report:", id)
+  )
   manifest <- list(
     id = id,
     code_version = code_version,
