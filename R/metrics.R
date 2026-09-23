@@ -736,6 +736,12 @@ dr_report_release <- function(
         "Use the original dr_measure() result to save a report, before dr_collect() or table edits. The original result retains the calculation and input history."
       )
     }
+    if (identical(m$input_quality, "volatile")) {
+      dataraft.core::dr_internal_abort(
+        "Volatile input checks cannot authorize an attested report.",
+        subclass = "dataraft_error_metrics"
+      )
+    }
     if (identical(m$input_published, FALSE)) {
       dataraft.core::dr_internal_abort(
         subclass = "dataraft_error_metrics",

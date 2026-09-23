@@ -1,7 +1,7 @@
 # Test bindings for this package; unavailable optional packages are not loaded.
 family_owners <- c(
-  "dr_catalog_export" = "dataraft.catalog",
-  "dr_catalog_app" = "dataraft.catalog",
+  "dr_catalog_export" = "dataraft.adapters",
+  "dr_catalog_app" = "dataraft.adapters",
   "dr_source_release" = "dataraft.lake",
   "dr_add_source" = "dataraft.core",
   "dr_set_target" = "dataraft.core",
