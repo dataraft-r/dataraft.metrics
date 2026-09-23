@@ -88,11 +88,14 @@ test_that("identifiers cannot inject SQL", {
     dr_contract(
       "bad; DROP TABLE",
       version = "v1",
-      owner = "owner",
-      description = "desc",
-      grain = "row",
       columns = c(id = "character")
-    ),
+    ) |>
+      dataraft.core::dr_contract_meta(
+        owner = "owner",
+        description = "desc",
+        grain = "row",
+        producer = "owner"
+      ),
     "Asset ids"
   )
   expect_error(dr_setup_lake(layers = "raw; DROP"), "Invalid identifier")
