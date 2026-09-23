@@ -145,7 +145,7 @@ dr_metric <- function(
 #' metric and input evidence needed by [dr_report_release()]. A live caller-owned
 #' lake is borrowed when available. Otherwise the saved configuration opens an
 #' owned read-only connection that closes before returning, including on errors.
-#' @param x Connected lake or successful `dr_run_result`. In-memory [dataraft.core::dr_trial()]
+#' @param x Connected lake or successful `dr_run_result`. In-memory [dataraft.core::dr_run()]
 #'   results support exploratory measurements with the same definitions. They
 #'   cannot be recorded or saved in issued reports, even for approved metrics.
 #' @param metric Single metric definition.
@@ -188,7 +188,7 @@ dr_metric <- function(
 #'   row.names = FALSE)
 #' source <- dataraft.core::dr_source_file("orders.file", path, reader = utils::read.csv)
 #' contract <- dataraft.core::dr_contract(
-#'   "orders", "1.0.0", "Analytics", "Order amounts", "One order",
+#'   "orders", version = "1.0.0", columns =
 #'   c(order_id = "integer", amount = "numeric"), key = "order_id"
 #' )
 #' release <- dataraft.core::dr_product("orders", contract = contract, code_version = "v1") |>
@@ -216,7 +216,7 @@ dr_measure <- function(
   if (inherits(x, "dr_model_result")) {
     dataraft.core::dr_internal_abort(
       subclass = "dataraft_error_metrics",
-      "Choose a reporting table with dr_product('report', model_result, table = 'table_name'), then dr_trial() or dr_publish() that product before dr_measure()."
+      "Choose a reporting table with dr_product('report', model_result, table = 'table_name'), then dr_run(write = FALSE, stop_on_failure = FALSE) or dr_publish() that product before dr_measure()."
     )
   }
   if (!is.null(metrics)) {
@@ -658,7 +658,7 @@ inform_measure_grouping <- function(metrics) {
 #'   row.names = FALSE)
 #' source <- dataraft.core::dr_source_file("orders.file", path, reader = utils::read.csv)
 #' contract <- dataraft.core::dr_contract(
-#'   "orders", "1.0.0", "Analytics", "Order amounts", "One order",
+#'   "orders", version = "1.0.0", columns =
 #'   c(order_id = "integer", amount = "numeric"), key = "order_id"
 #' )
 #' release <- dataraft.core::dr_product("orders", contract = contract, code_version = "v1") |>

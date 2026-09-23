@@ -87,11 +87,11 @@ test_that("identifiers cannot inject SQL", {
   expect_error(
     dr_contract(
       "bad; DROP TABLE",
-      "v1",
-      "owner",
-      "desc",
-      "row",
-      c(id = "character")
+      version = "v1",
+      owner = "owner",
+      description = "desc",
+      grain = "row",
+      columns = c(id = "character")
     ),
     "Asset ids"
   )
