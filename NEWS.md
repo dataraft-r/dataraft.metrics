@@ -1,3 +1,7 @@
+# dataraft.metrics 0.1.0.9005
+
+* Examples and checks use the consolidated product and quality interfaces.
+
 # dataraft.metrics 0.1.0.9004
 
 * Implement provider S3 diagnostic/quality methods and reject volatile input evidence for frozen report approvals.

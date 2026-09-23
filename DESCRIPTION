@@ -1,6 +1,6 @@
 Package: dataraft.metrics
 Title: Metrics Components for DataRaft
-Version: 0.1.0.9004
+Version: 0.1.0.9005
 Authors@R: person("Jan-Hendrik", "Weinert", role = c("aut", "cre"), email = "65009403+JanWein@users.noreply.github.com")
 Description: Compute reusable metrics on tables and checked product results.
     Builds on dataraft.core. Optional dataraft.lake integration freezes reports
@@ -8,11 +8,11 @@ Description: Compute reusable metrics on tables and checked product results.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends: R (>= 4.2.0)
-Imports: codetools, DBI, dataraft.core (>= 0.1.0.9004), digest, dplyr (>= 1.1.0), jsonlite, rlang, tibble
-Suggests: dataraft.adapters (>= 0.1.0.9004), bit64, dataraft.lake (>= 0.1.0.9000), duckdb (>= 1.5.5), testthat (>= 3.2.0), yaml, shiny, withr
+Imports: codetools, DBI, dataraft.core (>= 0.1.0.9005), digest, dplyr (>= 1.1.0), jsonlite, rlang, tibble
+Suggests: dataraft.adapters (>= 0.1.0.9005), bit64, dataraft.lake (>= 0.1.0.9000), duckdb (>= 1.5.5), testthat (>= 3.2.0), yaml, shiny, withr
 Config/testthat/edition: 3
 Roxygen: list(markdown = TRUE)
-Remotes: dataraft-r/dataraft.adapters@fix/deep-review, dataraft-r/dataraft.core@fix/deep-review, dataraft-r/dataraft.lake@fix/deep-review
+Remotes: dataraft-r/dataraft.adapters@fix/deep-review-2, dataraft-r/dataraft.core@fix/deep-review-2, dataraft-r/dataraft.lake@fix/deep-review-2
 URL: https://github.com/dataraft-r/dataraft.metrics
 BugReports: https://github.com/dataraft-r/dataraft.metrics/issues
 Config/roxygen2/version: 8.1.0
