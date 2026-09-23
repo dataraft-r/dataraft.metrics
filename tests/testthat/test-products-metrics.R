@@ -53,7 +53,7 @@ test_that("stock metrics refuse summing multiple dates", {
 })
 
 test_that("catalog exports only metadata and constructs a read-only app", {
-  skip_if_not_installed("dataraft.catalog")
+  skip_if_not_installed("dataraft.adapters")
   f <- fixture()
   on.exit(fixture_cleanup(f))
   dr_run(f$pipeline, f$lake)

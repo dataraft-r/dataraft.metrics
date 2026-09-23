@@ -1,3 +1,9 @@
+# dataraft.metrics 0.1.0.9004
+
+* Implement provider S3 diagnostic/quality methods and reject volatile input evidence for frozen report approvals.
+
+* Use the umbrella CI manifest as the single immutable family dependency lock.
+
 # dataraft.metrics 0.1.0.9000
 
 * Full CI now rejects skipped test blocks and records per-test summaries and

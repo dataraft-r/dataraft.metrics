@@ -52,3 +52,29 @@ test_that("nested report values are rejected before any report is written", {
   )
   expect_equal(nrow(dr_registry(f$lake, "reports")), 0L)
 })
+
+test_that("volatile input checks cannot be cached or approve reports", {
+  f <- fixture()
+  withr::defer(fixture_cleanup(f))
+  f$pipeline$steps$validate$rules[[1]]$volatile <- TRUE
+  expect_error(dr_run(f$pipeline, f$lake), "cache = FALSE")
+  first <- dr_run(f$pipeline, f$lake, cache = FALSE)
+  second <- dr_run(f$pipeline, f$lake, cache = FALSE)
+  expect_false(identical(first$release_id, second$release_id))
+  definition <- dr_metric(
+    "total",
+    "risk.validated",
+    approved = TRUE,
+    code_version = "v1",
+    compute = function(data, dimensions, params) {
+      dplyr::summarise(data, value = sum(reserve))
+    }
+  )
+  value <- dr_measure(f$lake, definition)
+  expect_identical(attr(value, "dr_manifest")$input_quality, "volatile")
+  expect_error(
+    dr_report_release(f$lake, "volatile", list(total = value), "v1"),
+    "Volatile"
+  )
+  expect_equal(nrow(dr_registry(f$lake, "reports")), 0L)
+})
