@@ -1,3 +1,8 @@
+# dataraft.metrics 0.1.0.9006
+
+* Use the current product API throughout code, examples and tests; development compatibility wrappers are removed.
+* Catalog integrations are provided exclusively by dataraft.adapters.
+
 # dataraft.metrics 0.1.0.9005
 
 * Examples and checks use the consolidated product and quality interfaces.
