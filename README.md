@@ -6,6 +6,15 @@ Use this experimental package when a report needs to retain what a measure meant
 
 [`dataraft` overview](https://github.com/dataraft-r/dataraft) · [Metrics reference](https://dataraft-r.github.io/dataraft/components/dataraft.metrics/reference/index.html)
 
+## Install
+
+Requires R 4.2 or later. Install the development package from GitHub:
+
+```r
+install.packages("pak")
+pak::pak("dataraft-r/dataraft.metrics")
+```
+
 ## Define a measure
 
 ```r
@@ -22,11 +31,10 @@ reserve <- dr_metric(
   approved = TRUE,
   code_version = "metric-v1"
 )
+print(reserve)
 ```
 
 The product `risk.validated` must exist as a checked release in a lake before you can evaluate this definition with `dr_measure(lake, reserve, at = as.Date("2026-08-31"))`. Approval is an explicit business declaration, not an automatic quality check. For a complete input-to-report workflow, see the [metrics guide](https://dataraft-r.github.io/dataraft/components/dataraft.metrics/reference/index.html) and the [DataRaft introduction](https://github.com/dataraft-r/dataraft).
-
-Install the development package with `pak::pak("dataraft-r/dataraft.metrics")`.
 
 ## Further details
 
